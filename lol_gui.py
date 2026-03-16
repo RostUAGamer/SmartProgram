@@ -8,6 +8,122 @@ import pyfiglet
 import winsound
 import threading
 
+# Словник перекладів
+LANG = {
+    "uk": {
+        "title": "FASTIV OS - Головний термінал",
+        "btn_matrix": "1. Matrix дощ",
+        "btn_hack": "2. Хак NASA",
+        "btn_joke": "3. Жарт",
+        "btn_guess": "4. Вгадай число",
+        "btn_rps": "5. Камінь/Ножиці",
+        "btn_weather": "6. Погода",
+        "btn_ai": "7. AI Чат",
+        "btn_exit": "8. Вихід",
+        "btn_submit": "ВІДПРАВИТИ",
+        "init": "ІНІЦІАЛІЗАЦІЯ СИСТЕМИ...",
+        "ask_lang": "Оберіть мову / Choose language:\n[1] Українська\n[2] English",
+        "ask_name": "Введіть ваше ім'я для авторизації:",
+        "access_granted": "Вітаю, {name}! Доступ дозволено.",
+        "choose_prog": "\nОберіть програму з меню нижче...",
+        "matrix_start": "Запуск Matrix дощу...",
+        "matrix_done": "Матриця стабілізована.",
+        "hack_start": "Ініціація операції...",
+        "hack_steps": [
+            "Підключення до серверів NASA...", "Обхід firewall...", 
+            "Сканування портів...", "Злам супутникового каналу...", 
+            "Дешифрування даних...", "Отримання ROOT-доступу..."
+        ],
+        "hack_done": "ДОСТУП НАДАНО",
+        "jokes": [
+            "Є 10 типів людей: ті хто знає двійкову систему і ті хто ні.",
+            "Мій код працює... і я боюсь його чіпати.",
+            "Ctrl + C / Ctrl + V — найкращий алгоритм.",
+            "Я не лінивий. Я просто кешую енергію."
+        ],
+        "weather": "Погода у місті: {temp}°C, {status}",
+        "weather_status": ["Ясно ☀️", "Хмарно ☁️", "Кодний дощ 🌧", "Матричний туман 🌫"],
+        "guess_start": "🎲 Я загадав число від 1 до 20. У тебе 5 спроб.\nВведи число в поле нижче:",
+        "guess_win": "🏆 Спроба {att}: Ти вгадав! Це {secret}!",
+        "guess_more": "📈 Спроба {att}: Більше! (Залишилось {left})",
+        "guess_less": "📉 Спроба {att}: Менше! (Залишилось {left})",
+        "guess_lose": "💀 Ти програв. Було число {secret}",
+        "guess_err": "⚠️ Введи число!",
+        "rps_start": "⚔️ Гра: Камінь, Ножиці, Папір\nВведи свій вибір у поле нижче (камінь/ножиці/папір):",
+        "rps_err": "⚠️ Введи: камінь, ножиці або папір",
+        "rps_bot": "🤖 Бот вибрав: {bot}",
+        "rps_draw": "🤝 Нічия",
+        "rps_win": "🏆 Ти виграв!",
+        "rps_lose": "💀 Бот переміг",
+        "rps_choices": {"камінь": "камінь", "ножиці": "ножиці", "папір": "папір"},
+        "ai_hello": "🤖 [AI-CHAT]: Привіт, {name}. Я самонавчальний алгоритм.",
+        "ai_q": [
+            "Який твій улюблений фреймворк?", 
+            "Ти готовий зламати систему сьогодні?", 
+            "Кава чи енергетик для кодування?"
+        ],
+        "ai_ans": "🤖 [AI-CHAT]: Запис завершено. NASA здивовані... 🤔",
+        "secret_act": "🔓 СЕКРЕТНИЙ РЕЖИМ АКТИВОВАНО!",
+        "secret_done": "⚡️ Система розігнана до 1.21 Гіга-LOL! ⚡️"
+    },
+    "en": {
+        "title": "FASTIV OS - Mainframe",
+        "btn_matrix": "1. Matrix Rain",
+        "btn_hack": "2. Hack NASA",
+        "btn_joke": "3. IT Joke",
+        "btn_guess": "4. Guess Number",
+        "btn_rps": "5. Rock/Paper",
+        "btn_weather": "6. Weather",
+        "btn_ai": "7. AI Chat",
+        "btn_exit": "8. Exit",
+        "btn_submit": "SUBMIT",
+        "init": "SYSTEM INITIALIZATION...",
+        "ask_lang": "Оберіть мову / Choose language:\n[1] Українська\n[2] English",
+        "ask_name": "Enter your name for authorization:",
+        "access_granted": "Welcome, {name}! Access granted.",
+        "choose_prog": "\nSelect a program from the menu below...",
+        "matrix_start": "Starting Matrix rain...",
+        "matrix_done": "Matrix stabilized.",
+        "hack_start": "Initiating operation...",
+        "hack_steps": [
+            "Connecting to NASA servers...", "Bypassing firewall...", 
+            "Scanning ports...", "Hacking satellite uplink...", 
+            "Decrypting data...", "Gaining ROOT access..."
+        ],
+        "hack_done": "ACCESS GRANTED",
+        "jokes": [
+            "There are 10 types of people: those who understand binary, and those who don't.",
+            "My code works... and I have no idea why.",
+            "Ctrl + C / Ctrl + V — the best algorithm.",
+            "I'm not lazy. I'm just caching my energy."
+        ],
+        "weather": "Local weather: {temp}°C, {status}",
+        "weather_status": ["Clear ☀️", "Cloudy ☁️", "Code rain 🌧", "Matrix fog 🌫"],
+        "guess_start": "🎲 I have a number from 1 to 20. You have 5 tries.\nEnter number below:",
+        "guess_win": "🏆 Try {att}: You won! It was {secret}!",
+        "guess_more": "📈 Try {att}: Higher! ({left} left)",
+        "guess_less": "📉 Try {att}: Lower! ({left} left)",
+        "guess_lose": "💀 You lost. The number was {secret}",
+        "guess_err": "⚠️ Enter a valid number!",
+        "rps_start": "⚔️ Rock, Paper, Scissors\nEnter your choice below (rock/paper/scissors):",
+        "rps_err": "⚠️ Enter: rock, paper, or scissors",
+        "rps_bot": "🤖 Bot chose: {bot}",
+        "rps_draw": "🤝 Draw",
+        "rps_win": "🏆 You won!",
+        "rps_lose": "💀 Bot wins",
+        "rps_choices": {"rock": "rock", "paper": "paper", "scissors": "scissors", "камінь": "rock", "ножиці": "scissors", "папір": "paper"},
+        "ai_hello": "🤖 [AI-CHAT]: Hello, {name}. I am a self-learning algorithm.",
+        "ai_q": [
+            "What's your favorite framework?", 
+            "Are you ready to hack the system today?", 
+            "Coffee or energy drink for coding?"
+        ],
+        "ai_ans": "🤖 [AI-CHAT]: Log saved. NASA is surprised... 🤔",
+        "secret_act": "🔓 SECRET OVERDRIVE ACTIVATED!",
+        "secret_done": "⚡️ System overclocked to 1.21 Giga-LOL! ⚡️"
+    }
+}
+
 class FastivOSApp:
     def __init__(self, root):
         self.root = root
@@ -39,8 +155,16 @@ class FastivOSApp:
         self.entry_field.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
         self.entry_field.bind("<Return>", self.handle_input)
         
+        # Змінні стану
+        self.current_state = "ASK_LANGUAGE" # ASK_LANGUAGE, ASK_NAME, MENU, GUESS, RPS, AI_CHAT
+        self.game_data = {}
+        self.user_name = "Гість"
+        self.lang = "uk" # Default
+
+        self.root.title(LANG[self.lang]["title"])
+
         self.btn_send = tk.Button(
-            self.frame_input, text="SUBMIT", bg="#333333", fg="#00FF00",
+            self.frame_input, text=LANG[self.lang]["btn_submit"], bg="#333333", fg="#00FF00",
             font=self.button_font, command=lambda: self.handle_input(None)
         )
         self.btn_send.pack(side=tk.RIGHT)
@@ -49,37 +173,47 @@ class FastivOSApp:
         self.frame_buttons = tk.Frame(root, bg="black")
         self.frame_buttons.pack(padx=10, pady=10, fill=tk.X)
 
-        buttons = [
-            ("1. Matrix дощ", self.run_matrix),
-            ("2. Хак NASA", self.run_hack),
-            ("3. Жарт", self.run_joke),
-            ("4. Вгадай число", self.start_guess_game),
-            ("5. Камінь/Ножиці", self.start_rps_game),
-            ("6. Погода", self.run_weather),
-            ("7. AI Чат", self.start_ai_chat),
-            ("8. Вихід", self.root.quit)
+        self.menu_buttons = [
+            (LANG[self.lang]["btn_matrix"], self.run_matrix),
+            (LANG[self.lang]["btn_hack"], self.run_hack),
+            (LANG[self.lang]["btn_joke"], self.run_joke),
+            (LANG[self.lang]["btn_guess"], self.start_guess_game),
+            (LANG[self.lang]["btn_rps"], self.start_rps_game),
+            (LANG[self.lang]["btn_weather"], self.run_weather),
+            (LANG[self.lang]["btn_ai"], self.start_ai_chat),
+            (LANG[self.lang]["btn_exit"], self.root.quit)
         ]
 
         # Розміщення кнопок у 2 ряди
-        for i, (text, cmd) in enumerate(buttons):
+        self.btn_widgets = []
+        for i, (text, cmd) in enumerate(self.menu_buttons):
             btn = tk.Button(
                 self.frame_buttons, text=text, bg="#222222", fg="#00FF00",
                 font=self.button_font, activebackground="#00FF00",
                 activeforeground="black", command=cmd, height=2
             )
             btn.grid(row=i//4, column=i%4, sticky="nsew", padx=3, pady=3)
+            self.btn_widgets.append(btn)
 
         # Налаштування колонок кнопок
         for col in range(4):
             self.frame_buttons.columnconfigure(col, weight=1)
 
-        # Змінні стану для інтерактивних ігор
-        self.current_state = "ASK_NAME" # ASK_NAME, MENU, GUESS, RPS, AI_CHAT
-        self.game_data = {}
-        self.user_name = "Гість"
-
         # Запуск вітання
-        self.ask_for_name()
+        self.ask_for_language()
+
+    def update_ui_language(self):
+        self.root.title(LANG[self.lang]["title"])
+        self.btn_send.config(text=LANG[self.lang]["btn_submit"])
+        
+        new_texts = [
+            LANG[self.lang]["btn_matrix"], LANG[self.lang]["btn_hack"], 
+            LANG[self.lang]["btn_joke"], LANG[self.lang]["btn_guess"], 
+            LANG[self.lang]["btn_rps"], LANG[self.lang]["btn_weather"], 
+            LANG[self.lang]["btn_ai"], LANG[self.lang]["btn_exit"]
+        ]
+        for i, btn in enumerate(self.btn_widgets):
+            btn.config(text=new_texts[i])
 
     # --- Утиліти вікна ---
     def get_time(self):
@@ -132,11 +266,17 @@ class FastivOSApp:
         for widget in self.frame_buttons.winfo_children():
             widget.config(state=tk.NORMAL)
 
-    def ask_for_name(self):
+    def ask_for_language(self):
         self.clear_console()
         self.disable_buttons()
-        self.print_to_console("ІНІЦІАЛІЗАЦІЯ СИСТЕМИ...", color="#00FF00")
-        self.print_to_console("Введіть ваше ім'я для авторизації:", color="#00FFFF")
+        self.print_to_console(LANG["uk"]["init"], color="#00FF00")
+        self.print_to_console(LANG["uk"]["ask_lang"], color="#00FFFF")
+        self.entry_field.focus()
+
+    def ask_for_name(self):
+        self.clear_console()
+        self.update_ui_language()
+        self.print_to_console(LANG[self.lang]["ask_name"], color="#00FFFF")
         self.entry_field.focus()
 
     # --- Звуки ---
@@ -161,10 +301,22 @@ class FastivOSApp:
 
         self.print_to_console(f"\n> {user_text}", color="#FFFFFF")
         
-        if self.current_state == "ASK_NAME":
+        if self.current_state == "ASK_LANGUAGE":
+            if user_text == "1":
+                self.lang = "uk"
+                self.current_state = "ASK_NAME"
+                self.ask_for_name()
+            elif user_text == "2":
+                self.lang = "en"
+                self.current_state = "ASK_NAME"
+                self.ask_for_name()
+            else:
+                self.print_to_console("⚠️ 1 or 2!")
+        elif self.current_state == "ASK_NAME":
             self.user_name = user_text
             self.current_state = "MENU"
-            self.print_to_console(f"Вітаю, {self.user_name}! Доступ дозволено.", color="#00FFFF")
+            msg = LANG[self.lang]["access_granted"].format(name=self.user_name)
+            self.print_to_console(msg, color="#00FFFF")
             self.enable_buttons()
             self.sound_success()
             self.root.after(1500, self.show_banner)
@@ -180,37 +332,30 @@ class FastivOSApp:
         self.clear_console()
         ascii_art = pyfiglet.figlet_format("FASTIV OS")
         self.print_to_console(ascii_art, color="#00FFFF")
-        self.sys_log("FASTIV MAINFRAME ONLINE")
-        self.print_to_console("\nОберіть програму з меню нижче...", color="#AAAAAA")
+        self.sys_log("MAINFRAME ONLINE")
+        self.print_to_console(LANG[self.lang]["choose_prog"], color="#AAAAAA")
 
     def matrix_rain_task(self):
         self.clear_console()
         chars = "01ABCDEF"
-        self.sys_log("Запуск Matrix дощу...", "INFO")
+        self.sys_log(LANG[self.lang]["matrix_start"], "INFO")
         for _ in range(25):
             line = "".join(random.choice(chars) for _ in range(70))
             self.print_to_console(line)
             time.sleep(0.04)
-        self.sys_log("Матриця стабілізована.")
+        self.sys_log(LANG[self.lang]["matrix_done"])
 
     def run_matrix(self):
         self.run_in_thread(self.matrix_rain_task)
 
     def fake_hack_task(self):
         self.clear_console()
-        steps = [
-            "Підключення до серверів NASA...",
-            "Обхід firewall...",
-            "Сканування портів...",
-            "Злам супутникового каналу...",
-            "Дешифрування даних...",
-            "Отримання ROOT-доступу..."
-        ]
-        self.sys_log("Ініціація операції...", "HACK")
+        steps = LANG[self.lang]["hack_steps"]
+        self.sys_log(LANG[self.lang]["hack_start"], "HACK")
         for step in steps:
             self.typewriter(step, 0.03, "💻")
             time.sleep(random.uniform(0.3, 0.7))
-        self.sys_log("ACCESS GRANTED", "HACK")
+        self.sys_log(LANG[self.lang]["hack_done"], "HACK")
         self.sound_success()
 
     def run_hack(self):
@@ -218,19 +363,15 @@ class FastivOSApp:
 
     def run_joke(self):
         self.clear_console()
-        jokes = [
-            "Є 10 типів людей: ті хто знає двійкову систему і ті хто ні.",
-            "Мій код працює... і я боюсь його чіпати.",
-            "Ctrl + C / Ctrl + V — найкращий алгоритм.",
-            "Я не лінивий. Я просто кешую енергію."
-        ]
+        jokes = LANG[self.lang]["jokes"]
         self.run_in_thread(lambda: self.typewriter(random.choice(jokes), 0.03, "🃏"))
 
     def run_weather(self):
         self.clear_console()
         temp = random.randint(18, 25)
-        status = random.choice(["Ясно ☀️", "Хмарно ☁️", "Кодний дощ 🌧", "Матричний туман 🌫"])
-        self.sys_log(f"Погода у Фастові: {temp}°C, {status}")
+        status = random.choice(LANG[self.lang]["weather_status"])
+        msg = LANG[self.lang]["weather"].format(temp=temp, status=status)
+        self.sys_log(msg)
 
     # --- Інтерактивні ігри ---
     def start_guess_game(self):
@@ -241,8 +382,7 @@ class FastivOSApp:
             "attempts": 5,
             "current": 0
         }
-        self.print_to_console("🎲 Я загадав число від 1 до 20. У тебе 5 спроб.")
-        self.print_to_console("Введи число в поле нижче:")
+        self.print_to_console(LANG[self.lang]["guess_start"])
 
     def process_guess(self, user_text):
         try:
@@ -251,50 +391,59 @@ class FastivOSApp:
             att = self.game_data["current"]
             max_att = self.game_data["attempts"]
             secret = self.game_data["secret"]
+            left = max_att - att
             
             if guess == secret:
-                self.print_to_console(f"🏆 Спроба {att}: Ти вгадав! Це {secret}!")
+                msg = LANG[self.lang]["guess_win"].format(att=att, secret=secret)
+                self.print_to_console(msg)
                 self.sound_success()
                 self.current_state = "MENU"
             elif guess < secret:
-                self.print_to_console(f"📈 Спроба {att}: Більше! (Залишилось {max_att - att})")
+                msg = LANG[self.lang]["guess_more"].format(att=att, left=left)
+                self.print_to_console(msg)
             else:
-                self.print_to_console(f"📉 Спроба {att}: Менше! (Залишилось {max_att - att})")
+                msg = LANG[self.lang]["guess_less"].format(att=att, left=left)
+                self.print_to_console(msg)
                 
             if guess != secret and att >= max_att:
-                self.print_to_console(f"💀 Ти програв. Було число {secret}")
+                msg = LANG[self.lang]["guess_lose"].format(secret=secret)
+                self.print_to_console(msg)
                 self.sound_fail()
                 self.current_state = "MENU"
                 
         except ValueError:
-            self.print_to_console("⚠️ Введи число!")
+            self.print_to_console(LANG[self.lang]["guess_err"])
 
     def start_rps_game(self):
         self.clear_console()
         self.current_state = "RPS"
-        self.print_to_console("⚔️ Гра: Камінь, Ножиці, Папір")
-        self.print_to_console("Введи свій вибір у поле нижче:")
+        self.print_to_console(LANG[self.lang]["rps_start"])
 
     def process_rps(self, user_text):
-        choices = ["камінь", "ножиці", "папір"]
-        player = user_text.lower()
+        avail_choices = LANG[self.lang]["rps_choices"]
+        player_raw = user_text.lower()
         
-        if player not in choices:
-            self.print_to_console("⚠️ Введи: камінь, ножиці або папір")
+        if player_raw not in avail_choices:
+            self.print_to_console(LANG[self.lang]["rps_err"])
             return
             
-        bot = random.choice(choices)
-        self.print_to_console(f"🤖 Бот вибрав: {bot}")
+        player = avail_choices[player_raw]
+        bot = random.choice(["rock", "paper", "scissors"])
+        # Перекладаємо хід бота на поточну мову візуально (через пошук ключа по значенню)
+        bot_display = [k for k, v in avail_choices.items() if v == bot][0] if self.lang == "uk" else bot
+        
+        msg = LANG[self.lang]["rps_bot"].format(bot=bot_display)
+        self.print_to_console(msg)
 
         if player == bot:
-            self.print_to_console("🤝 Нічия")
-        elif (player == "камінь" and bot == "ножиці") or \
-             (player == "ножиці" and bot == "папір") or \
-             (player == "папір" and bot == "камінь"):
-            self.print_to_console("🏆 Ти виграв!")
+            self.print_to_console(LANG[self.lang]["rps_draw"])
+        elif (player == "rock" and bot == "scissors") or \
+             (player == "scissors" and bot == "paper") or \
+             (player == "paper" and bot == "rock"):
+            self.print_to_console(LANG[self.lang]["rps_win"])
             self.sound_success()
         else:
-            self.print_to_console("💀 Бот переміг")
+            self.print_to_console(LANG[self.lang]["rps_lose"])
             self.sound_fail()
             
         self.current_state = "MENU"
@@ -302,24 +451,21 @@ class FastivOSApp:
     def start_ai_chat(self):
         self.clear_console()
         self.current_state = "AI_CHAT"
-        self.print_to_console(f"🤖 [AI-CHAT]: Привіт, {self.user_name}. Я самонавчальний алгоритм Фастова.")
+        msg = LANG[self.lang]["ai_hello"].format(name=self.user_name)
+        self.print_to_console(msg)
         
-        questions = [
-            "Який твій улюблений фреймворк?",
-            "Ти готовий зламати систему сьогодні?",
-            "Кава чи енергетик для кодування?"
-        ]
-        q = random.choice(questions)
+        q = random.choice(LANG[self.lang]["ai_q"])
         self.print_to_console(f"🤖 [AI-CHAT]: {q}")
 
     def process_ai_chat(self, user_text):
         self.current_state = "MENU"
-        self.run_in_thread(lambda: self.typewriter("🤖 [AI-CHAT]: Запис завершено. NASA здивовані... 🤔"))
+        ans = LANG[self.lang]["ai_ans"]
+        self.run_in_thread(lambda: self.typewriter(ans))
 
     def secret_mode_task(self):
         self.clear_console()
         self.print_to_console("\n" + "🔥" * 30)
-        self.print_to_console("🔓 SECRET OVERDRIVE ACTIVATED!")
+        self.print_to_console(LANG[self.lang]["secret_act"])
         self.print_to_console("🔥" * 30 + "\n")
         
         for _ in range(12):
@@ -328,7 +474,7 @@ class FastivOSApp:
             time.sleep(0.05)
 
         self.sound_success()
-        self.print_to_console("\n⚡️ Система розігнана до 1.21 Гіга-LOL! ⚡️")
+        self.print_to_console("\n" + LANG[self.lang]["secret_done"])
 
     def run_secret(self):
         self.run_in_thread(self.secret_mode_task)
