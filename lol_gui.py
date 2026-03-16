@@ -28,6 +28,7 @@ class FastivOSApp:
 
         # Контейнер для вводу (для ігор)
         self.frame_input = tk.Frame(root, bg="black")
+        self.frame_input.pack(padx=10, pady=(0, 5), fill=tk.X)
         
         self.input_var = tk.StringVar()
         self.entry_field = tk.Entry(
@@ -56,7 +57,7 @@ class FastivOSApp:
             ("5. Камінь/Ножиці", self.start_rps_game),
             ("6. Погода", self.run_weather),
             ("7. AI Чат", self.start_ai_chat),
-            ("💥 SECRET", self.run_secret)
+            ("8. Вихід", self.root.quit)
         ]
 
         # Розміщення кнопок у 2 ряди
@@ -73,11 +74,12 @@ class FastivOSApp:
             self.frame_buttons.columnconfigure(col, weight=1)
 
         # Змінні стану для інтерактивних ігор
-        self.current_state = "MENU" # MENU, GUESS, RPS, AI_CHAT
+        self.current_state = "ASK_NAME" # ASK_NAME, MENU, GUESS, RPS, AI_CHAT
         self.game_data = {}
+        self.user_name = "Гість"
 
         # Запуск вітання
-        self.show_banner()
+        self.ask_for_name()
 
     # --- Утиліти вікна ---
     def get_time(self):
@@ -130,14 +132,12 @@ class FastivOSApp:
         for widget in self.frame_buttons.winfo_children():
             widget.config(state=tk.NORMAL)
 
-    def show_input(self):
-        self.frame_input.pack(padx=10, pady=(0, 5), fill=tk.X, before=self.frame_buttons)
+    def ask_for_name(self):
+        self.clear_console()
+        self.disable_buttons()
+        self.print_to_console("ІНІЦІАЛІЗАЦІЯ СИСТЕМИ...", color="#00FF00")
+        self.print_to_console("Введіть ваше ім'я для авторизації:", color="#00FFFF")
         self.entry_field.focus()
-
-    def hide_input(self):
-        self.frame_input.pack_forget()
-        self.input_var.set("")
-        self.current_state = "MENU"
 
     # --- Звуки ---
     def sound_success(self):
@@ -153,9 +153,22 @@ class FastivOSApp:
             return
             
         self.input_var.set("")
+
+        if user_text == "404":
+            self.print_to_console(f"\n> 404", color="#FFFFFF")
+            self.run_secret()
+            return
+
         self.print_to_console(f"\n> {user_text}", color="#FFFFFF")
         
-        if self.current_state == "GUESS":
+        if self.current_state == "ASK_NAME":
+            self.user_name = user_text
+            self.current_state = "MENU"
+            self.print_to_console(f"Вітаю, {self.user_name}! Доступ дозволено.", color="#00FFFF")
+            self.enable_buttons()
+            self.sound_success()
+            self.root.after(1500, self.show_banner)
+        elif self.current_state == "GUESS":
             self.process_guess(user_text)
         elif self.current_state == "RPS":
             self.process_rps(user_text)
@@ -230,7 +243,6 @@ class FastivOSApp:
         }
         self.print_to_console("🎲 Я загадав число від 1 до 20. У тебе 5 спроб.")
         self.print_to_console("Введи число в поле нижче:")
-        self.show_input()
 
     def process_guess(self, user_text):
         try:
@@ -243,7 +255,7 @@ class FastivOSApp:
             if guess == secret:
                 self.print_to_console(f"🏆 Спроба {att}: Ти вгадав! Це {secret}!")
                 self.sound_success()
-                self.hide_input()
+                self.current_state = "MENU"
             elif guess < secret:
                 self.print_to_console(f"📈 Спроба {att}: Більше! (Залишилось {max_att - att})")
             else:
@@ -252,7 +264,7 @@ class FastivOSApp:
             if guess != secret and att >= max_att:
                 self.print_to_console(f"💀 Ти програв. Було число {secret}")
                 self.sound_fail()
-                self.hide_input()
+                self.current_state = "MENU"
                 
         except ValueError:
             self.print_to_console("⚠️ Введи число!")
@@ -262,7 +274,6 @@ class FastivOSApp:
         self.current_state = "RPS"
         self.print_to_console("⚔️ Гра: Камінь, Ножиці, Папір")
         self.print_to_console("Введи свій вибір у поле нижче:")
-        self.show_input()
 
     def process_rps(self, user_text):
         choices = ["камінь", "ножиці", "папір"]
@@ -286,12 +297,12 @@ class FastivOSApp:
             self.print_to_console("💀 Бот переміг")
             self.sound_fail()
             
-        self.hide_input()
+        self.current_state = "MENU"
 
     def start_ai_chat(self):
         self.clear_console()
         self.current_state = "AI_CHAT"
-        self.print_to_console("🤖 [AI-CHAT]: Привіт, Ростиславе. Я самонавчальний алгоритм Фастова.")
+        self.print_to_console(f"🤖 [AI-CHAT]: Привіт, {self.user_name}. Я самонавчальний алгоритм Фастова.")
         
         questions = [
             "Який твій улюблений фреймворк?",
@@ -300,10 +311,9 @@ class FastivOSApp:
         ]
         q = random.choice(questions)
         self.print_to_console(f"🤖 [AI-CHAT]: {q}")
-        self.show_input()
 
     def process_ai_chat(self, user_text):
-        self.hide_input()
+        self.current_state = "MENU"
         self.run_in_thread(lambda: self.typewriter("🤖 [AI-CHAT]: Запис завершено. NASA здивовані... 🤔"))
 
     def secret_mode_task(self):
